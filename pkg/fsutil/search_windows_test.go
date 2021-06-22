@@ -1,5 +1,3 @@
-// +build !windows,!plan9,!js
-
 package fsutil
 
 import (
@@ -14,19 +12,19 @@ func TestEachExternal(t *testing.T) {
 	binPath, cleanup := testutil.InTestDir()
 	defer cleanup()
 
-	restorePath := testutil.WithTempEnv("PATH", "/foo:"+binPath+":/bar")
+	restorePath := testutil.WithTempEnv("PATH", "/foo;"+binPath+";/bar")
 	defer restorePath()
 
 	testutil.ApplyDir(testutil.Dir{
-		"dir":  testutil.Dir{},
-		"file": "",
-		"cmdx": "#!/bin/sh",
-		"cmd1": testutil.File{Perm: 0755, Content: "#!/bin/sh"},
-		"cmd2": testutil.File{Perm: 0755, Content: "#!/bin/sh"},
-		"cmd3": testutil.File{Perm: 0755, Content: ""},
+		"dir":      testutil.Dir{},
+		"file.txt": "",
+		"cmd.bat":  testutil.File{Perm: 0755, Content: ""},
+		"cmd.cmd":  testutil.File{Perm: 0755, Content: ""},
+		"cmd.exe":  "",
+		"cmd.txt":  testutil.File{Perm: 0755, Content: ""},
 	})
 
-	wantCmds := []string{"cmd1", "cmd2", "cmd3"}
+	wantCmds := []string{"cmd.bat", "cmd.cmd", "cmd.exe"}
 	gotCmds := []string{}
 	EachExternal(func(cmd string) { gotCmds = append(gotCmds, cmd) })
 
